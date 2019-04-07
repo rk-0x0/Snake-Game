@@ -1,15 +1,16 @@
 
 #include<bits/stdc++.h>
+
 #include<GL/glut.h>
 using namespace std;
 
 int x,y,state,st,score;
-int t;
+int t,fl,op;
 
 class node
 {  public:
     int j,k,p,q;
-    node *next,*prev;
+    node *next;
 };
 void new_prey();
 class S
@@ -28,14 +29,13 @@ class S
         tail->p=tail->k=20;
 
         head->next=tail;
-        tail->prev=head;
         tail->next=NULL;
-        head->prev=NULL;
+
     }
 
 void erase(int m,int n)
 {
-    glColor3f(0.0,0.0,0.0);
+    glColor3f(0.0,0.1,0.0);
         glBegin(GL_QUADS);
         glVertex2i(m-10,n+10);
         glVertex2i(m-10,n-10);
@@ -92,12 +92,6 @@ void snake()
       if(temp->next==NULL)
         erase(temp->j,temp->k);
 
-      if(temp->j<10 || temp->j>590 || temp->k<10 || temp->k>590)
-      {
-        cout<<"\n Crashed with wall \n!!!  Game Over !!!\n\n"<<"\n   Score : "<<score*10<<endl;
-        exit(0);
-      }
-
         if(temp==head)
         {
         if(state==1 )
@@ -109,6 +103,29 @@ void snake()
         else if(state==4)
        temp->p +=20;
         }
+
+      if(temp==head)
+      {
+
+      if(temp->j>250 && temp->k>590 && temp->j<330 )
+      {
+          temp->q=20;
+      }
+      else if(temp->j>250 && temp->k<10 && temp->j<330 )
+      {
+          temp->q=580;
+      }
+
+      else if(temp->j<10 || temp->j>590 || temp->k<10 || temp->k>590)
+      {
+        cout<<"\n Crashed with wall \n!!!  Game Over !!!\n\n"<<"\n   Score : "<<score*10<<endl;
+        fl=1;op=1;
+        //exit(0);
+
+      }
+      }
+
+
     //redraw
         if(temp==head)
         {
@@ -116,12 +133,13 @@ void snake()
             if(b)
             {
                 cout<<"\n\tStrangled\n !!!  Game Over !!!\n\n"<<"\n\tScore : "<<score*10<<endl;
-                exit(0);
+                fl=1;op=1;
+                //exit(0);
             }
         }
         glColor3f(0.0,1.0,1.0);
         if(temp==head)
-            glColor3f(1.0,0.0,1.0);
+            glColor3f(0.8,0.2,0.2);
 
         redraw(temp->p,temp->q);
 
@@ -134,11 +152,13 @@ void snake()
         if(temp->p==(x+10) && temp->q==y-10)
         {   ++score;
            new_prey();
-           t=t-2;
+           t=t-5;
            if(t<20)
            {
                cout<<"Congrats! You have completed the challange\n"<<"\tScore : "<<score;
-               exit(0);
+               //exit(0);
+               fl=1;
+
            }
            f=1;
         }
@@ -164,12 +184,39 @@ f=0;
 }
 };
 
+
+void DisplayText(string text, int x, int y, int font)
+{
+	void *p = NULL;
+	if (font < 8 && font>1)
+        p = ((void *)font);
+	else
+	    p = ((void *)5);
+
+	glColor3f(1, 0, 0);
+	glRasterPos2f(x, y);
+	size_t len = text.length();
+	for (int i = 0; i < len; i++)
+		glutBitmapCharacter(p, (int)text[i]);
+
+	glColor3f(1, 0, 0);
+}
+
+
 S saap;
 
 void Timer(int value)
 {
    saap.snake();
-   glutTimerFunc(t, Timer, 0); // next Timer call milliseconds later
+   if(!fl)
+    glutTimerFunc(t, Timer, 0);
+    else
+       {  if(op==1)
+           DisplayText("!!!  Game Over !!!",220,320,5);
+          else
+            DisplayText("Congrats!! You Won",220,320,5);
+           glFlush();
+       }
 }
 
 void boundry()
@@ -179,23 +226,46 @@ void boundry()
    glColor3f(1.0,0.0,0.0);
    glBegin(GL_QUADS);
     //leftWall
+    glColor3f(0.8,0.5,0.5);
      glVertex2f(0.0,0.0);
      glVertex2f(10.0,0.0);
+    glColor3f(1.0,1.0,1.0);
      glVertex2f(10.0,600.0);
      glVertex2f(0.0,600.0);
     //downWall
+    glColor3f(1.0,1.0,1.0);
      glVertex2f(0.0,0.0);
      glVertex2f(0.0,10.0);
+     glColor3f(0.8,0.5,0.5);
+     glVertex2f(250.0,10.0);
+     glVertex2f(250.0,0.0);
+
+     glColor3f(1.0,1.0,1.0);
+     glVertex2f(330.0,0.0);
+     glVertex2f(330.0,10.0);
+    glColor3f(0.8,0.5,0.5);
      glVertex2f(600.0,10.0);
      glVertex2f(600.0,0.0);
+
     //rightWall
+   glColor3f(0.8,0.5,0.5);
      glVertex2f(590.0,0.0);
      glVertex2f(600.0,0.0);
+    glColor3f(1.0,1.0,1.0);
      glVertex2f(600.0,600.0);
      glVertex2f(590.0,600.0);
     //topWall
+    glColor3f(1.0,1.0,1.0);
      glVertex2f(600.0,600.0);
      glVertex2f(600.0,590.0);
+    glColor3f(0.8,0.5,0.5);
+     glVertex2f(330.0,590.0);
+     glVertex2f(330.0,600.0);
+
+     glColor3f(1.0,1.0,1.0);
+      glVertex2f(250.0,600.0);
+     glVertex2f(250.0,590.0);
+    glColor3f(0.8,0.5,0.5);
      glVertex2f(0.0,590.0);
      glVertex2f(0.0,600.0);
 
@@ -264,8 +334,8 @@ void new_prey()
        b= saap.checkStrangled(x,y);
        if(b)
        {
-           checkNext(i,x,y);
-           i++;
+           new_prey();
+           return;
        }
 
    }
@@ -278,6 +348,7 @@ void new_prey()
    glBegin(GL_QUADS);
       glVertex2i(x,y);
       glVertex2i(x+20,y);
+      glColor3f(0.2,0.5,0.2);
       glVertex2i(x+20,y-20);
       glVertex2i(x,y-20);
     glEnd();
@@ -326,13 +397,12 @@ void my_keyboard(int key, int x, int y)
 void myinit()
 {
     srand (time(NULL));
-    glClearColor(0.0,0.0,0.0,0.0);
+    glClearColor(0.0,0.1,0.0,0.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0,600,0,600);
-   glClearColor(0.0,0.0,0.0,0.0);
-   glClear(GL_COLOR_BUFFER_BIT);
+
    boundry();
     new_prey();
     state=1;
